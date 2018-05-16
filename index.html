@@ -1,0 +1,1063 @@
+<html>
+<head>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js"></script>
+    <script src="https://use.typekit.net/mqr5afk.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <script src="html2canvas.js"></script>
+
+    <style>
+
+        @font-face {
+            font-family:'DFPGothic-SU';
+            src: url('DFPGothic-SU.eot');
+            src: url('DFPGothic-SU.eot?#iefix') format('embedded-opentype'),
+                url('DFPGothic-SU.woff2') format('woff2'),
+                url('DFPGothic-SU.woff') format('woff'),
+                url('DFPGothic-SU.svg#DFPGothic-SU') format('svg');
+            font-weight: 400;
+            font-style: normal;
+            font-stretch: normal;
+            unicode-range: U+0020-00F7;
+        }
+
+        body {
+            background-color:#000;
+            overflow-x:hidden;
+        }
+
+        div {
+            box-sizing:border-box;
+        }
+
+        #gridContainer {
+            opacity:0;
+            position:fixed;
+            top:50px;
+            width:1320px;
+            height:330px;
+            z-index:11;
+            background-color:#222;
+        }
+
+        #greyBack {
+            opacity:0;
+            position:fixed;
+            top:50px;
+            left:0px;
+            width:100%;
+            height:380px;
+            background-color:#222;
+            z-index:10;
+        }
+
+        #fixedGridContainer {
+            opacity:1;
+            position:fixed;
+            bottom:50px;
+            left:-5000px;
+            background-color:#222;
+            width:1800px;
+            height:450px;
+        }
+
+        .guideBox {
+            position:absolute;
+            left:0px;
+            top:0px;
+            opacity:0;
+        }
+
+        .charBox {
+            position:absolute;
+            left:0px;
+            top:0px;
+            background-image:url('backdrop.png');
+            width:100px;
+            height:100px;
+            border: solid 1px #000;
+        } 
+
+        .charImage {
+            width:100%;
+            height:100%;
+            background-position:center;
+            background-size:cover;
+        }
+
+        .nameBar {
+            background-color:#000;
+            position:absolute;
+            bottom:-1%;
+            width:102%;
+            left:-1%;
+            height:16%;
+        }
+
+        .nameText {
+            padding:0px;
+            position:absolute;
+            bottom:0px;
+            text-align:center;
+            color:#fff;
+            font-family:'DFPGothic-SU';
+            text-shadow:
+                -1px -1px 0 #000,  
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+            white-space:nowrap;
+            transform-origin:0px 0px;
+        }
+
+        #charchoices {
+            opacity:0;
+            position:absolute;
+            top:520px;
+            left:0px;
+            width:100%;
+            color:#fff;
+            font-family:jaf-domus;
+            padding:30px;
+            z-index:1;
+        }
+
+        .title {
+            font-weight:700;
+            position:absolute;
+            top:5px;
+            font-size:20px;
+        }
+
+ 
+        input[type=checkbox] {
+            opacity:0;
+            cursor:pointer;
+            z-index:3;
+            position:absolute;
+            transform:translateX(-3px) translateY(2px);
+        }
+
+        label {
+            display: inline-block;
+            position: absolute;
+            left:0px;
+            transform:translateY(3px);
+            z-index:1;
+        }
+
+        label:before {
+            content: "";
+            display: inline-block;
+            width: 13px;
+            height: 13px;
+            background-color: transparent;
+            border:2px solid #fff;
+            border-radius:2px;
+            box-sizing:border-box;
+            z-index:1;
+        }
+
+        input[type=checkbox]:checked + label:before {
+            background-color:#fff;
+            z-index:3;
+        }
+
+                
+        .charColumn {
+            position:absolute;
+            left:0px;
+            top:40px;
+            width:170px;
+            transform:translateX(20px);
+        }
+
+        .presetButton {
+            position:fixed;
+            top:10px;
+            background-color:#666;
+            width:50px;
+            height:30px;
+            line-height:30px;
+            text-align:center;
+            color:#fff;
+            cursor:pointer;
+            border-radius:5px;
+            font-weight:700;
+            font-family:jaf-domus;
+            z-index:5;
+        }
+
+        .picButton {
+            position:fixed;
+            bottom:10px;
+            background-color:#666;
+            width:50px;
+            height:30px;
+            line-height:30px;
+            text-align:center;
+            color:#fff;
+            cursor:pointer;
+            border-radius:5px;
+            font-weight:700;
+            font-family:jaf-domus;
+            z-index:5;
+            display:none;
+        }
+
+        .presetButton:hover {
+            background-color:#888;
+        }
+
+        .presetButton:active {
+            background-color:#fff;
+            color:#666;
+        }
+
+        #topBar {
+            z-index:4;
+            position:fixed;
+            top:0px;
+            left:0px;
+            width:100%;
+            height:50px;
+            background-color:#000;
+            color:#fff;
+            font-size:30px;
+            font-family:filson-pro;
+            font-weight:700;
+            line-height:50px;
+            padding:0px 20px;
+        }
+
+        #canvasOutput {
+            position:fixed;
+            left:50%;
+            top:50%;
+            transform-origin:50% 50%;
+            transform:translateX(-50%) translateY(-50%);
+            z-index:999;
+        }
+
+        @media all and (max-width: 950px) {#topBar{font-size:18px}}
+        @media all and (max-width: 765px) {#topBar{font-size:13px}}
+        @media all and (max-width: 680px) {#topBar{display:none}}
+
+
+    </style>
+
+
+
+</head>
+<body>
+
+<div id="canvasOutput1"></div>
+<div id="fixedGridContainer"></div>
+
+<div class="presetButton" style="right:380px" onclick="applyPreset('smash64')">64</div>
+<div class="presetButton" style="right:320px" onclick="applyPreset('melee')">Melee</div>
+<div class="presetButton" style="right:260px" onclick="applyPreset('brawl')">Brawl</div>
+<div class="presetButton" style="right:200px" onclick="applyPreset('for')">4</div>
+<div class="presetButton" style="right:90px;width:100px" onclick="applyPreset('confirmed')">CONFIRMED</div>
+<div class="presetButton" style="right:20px;background-color:#000;border: solid 2px #fff;line-height:26px;width:60px" onclick="applyPreset('clear')">CLEAR</div>
+<div id="topbar" style="">SUPER SMASH BUILD-A-ROSTER</div>
+
+<div class="picButton" style="right:20px" onclick="createCanvas()">	&#128247;</div>
+
+<div id="greyBack"><div id="gridContainer"></div></div>
+
+<div id="charChoices">
+
+
+
+<div class="charColumn" id="column0" style="left:0px"></div>
+<div class="charColumn" id="column1" style="left:180px"></div>
+<div class="charColumn" id="column2" style="left:360px"></div>
+<div class="charColumn" id="column3" style="left:540px"></div>
+<div class="charColumn" id="column4" style="left:720px"></div>
+<div class="charColumn" id="column5" style="left:900px"></div>
+<div class="charColumn" id="column6" style="left:1080px"></div>
+<div class="charColumn" id="column7" style="left:1260px"></div>
+<div class="charColumn" id="column8" style="left:1440px"></div>
+<div class="charColumn" id="column9" style="left:1620px"></div>
+<div class="charColumn" id="column10" style="left:1800px"></div>
+<div class="charColumn" id="column11" style="left:1980px"></div>
+<div class="charColumn" id="column12" style="left:2160px"></div>
+<div class="charColumn" id="column13" style="left:2340px"></div>
+<div class="charColumn" id="column14" style="left:2520px"></div>
+
+
+<span class="title" id="titleR" style="left:20px">RETURNING</span>
+
+
+
+<span class="title" id="titleN" style="left:700px">NEWCOMERS</span>
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+<script>
+
+function createCanvas(){
+    html2canvas($("#fixedGridContainer")[0]).then(function(canvas) {
+        canvas.id="screenShot";
+       // $("#canvasOutput1").append(canvas);
+
+     //    TweenMax.set("#screenShot",{"z-index":999,"position":"fixed",bottom:80});
+
+        var img = canvas.toDataURL()
+        var iframe = '<iframe src="' + img + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>'
+    
+      var x =   open('index.html','','width='+(canvas.width+16)+',height='+(canvas.height+16)+',titlebar=0,menubar=0,toolbar=0,scrollbars=0,resizable=0');
+     
+        
+    x.document.open();
+    x.document.write('<body style="background-color:#222;padding:0px">'+iframe+'</body>');
+    x.document.close();
+
+
+
+    });
+}
+
+
+
+charList = {
+    1:{
+        groupName: "MARIO",
+        stayGrouped: true,
+        chars:[
+            {name:"MARIO",returning:true,checked:true,file:"MARIO.png"},
+            {name:"LUIGI",returning:true,checked:true,file:"LUIGI.png"},
+            {name:"PEACH",returning:true,checked:true,file:"PEACH.png"},
+            {name:"BOWSER",returning:true,checked:true,file:"BOWSER.png"},
+            {name:"BOWSER JR.",returning:true,checked:true,file:"BOWSER_JR.png"},
+            {name:"YOSHI",returning:true,checked:true,file:"YOSHI.png"},
+            {name:"ROSALINA",returning:true,checked:true,file:"ROSALINA.png"},
+            {name:"DAISY",returning:false,checked:false,file:"DAISY.png"},
+            {name:"WARIO",returning:true,checked:true,file:"WARIO.png"},
+            {name:"WALUIGI",returning:false,checked:false,file:"WALUIGI.png"},
+            {name:"DR. MARIO",returning:true,checked:true,file:"DR_MARIO.png"},   
+            {name:"TOAD",returning:false,checked:false,file:"TOAD.png"},
+            {name:"CAPTAIN TOAD",returning:false,checked:false,file:"CAPTAIN_TOAD.png"},
+            {name:"TOADETTE",returning:false,checked:false,file:"TOADETTE.png"},
+        ]
+    },
+    2:{
+        groupName: "DONKEY KONG",
+        stayGrouped: true,
+        chars:[
+            {name:"DONKEY KONG",returning:true,checked:true,file:"DONKEY_KONG.png"},
+            {name:"DIDDY KONG",returning:true,checked:true,file:"DIDDY_KONG.png"},
+            {name:"DIXIE KONG",returning:false,checked:false,file:"DIXIE_KONG.png"},
+            {name:"CRANKY KONG",returning:false,checked:false,file:"CRANKY_KONG.png"},
+            {name:"FUNKY KONG",returning:false,checked:false,file:"FUNKY_KONG.png"},
+            {name:"K. ROOL",returning:false,checked:false,file:"K_ROOL.png"},
+        ]
+    },
+    3:{
+        groupName: "ZELDA",
+        stayGrouped: true,
+        chars:[
+            {name:"LINK",returning:true,checked:true,file:"LINK.png"},
+            {name:"ZELDA",returning:true,checked:true,file:"ZELDA.png"},
+            {name:"SHEIK",returning:true,checked:true,file:"SHEIK.png"},
+            {name:"GANONDORF",returning:true,checked:true,file:"GANONDORF.png"},
+            {name:"TOON LINK",returning:true,checked:true,file:"TOON_LINK.png"},
+            {name:"TETRA",returning:false,checked:false,file:"TETRA.png"},
+            {name:"YOUNG LINK",returning:true,checked:false,file:"YOUNG_LINK.png"},
+            {name:"IMPA",returning:false,checked:false,file:"IMPA.png"},
+            {name:"TINGLE",returning:false,checked:false,file:"TINGLE.png"},
+        ]
+    },
+    4:{
+        groupName: "POKÉMON",
+        stayGrouped: true,
+        chars:[
+            {name:"PIKACHU",returning:true,checked:true,file:"PIKACHU.png"},
+            {name:"PICHU",returning:true,checked:false,file:"PICHU.png"},
+            {name:"RAICHU",returning:false,checked:false,file:"RAICHU.png"},
+            {name:"JIGGLYPUFF",returning:true,checked:true,file:"JIGGLYPUFF.png"},
+            {name:"POKEMON TRAINER",returning:true,checked:false,file:"POKEMON_TRAINER.png"},
+            {name:"SQUIRTLE",returning:true,checked:false,file:"SQUIRTLE.png"},
+            {name:"IVYSAUR",returning:true,checked:false,file:"IVYSAUR.png"},
+            {name:"CHARIZARD",returning:true,checked:true,file:"CHARIZARD.png"},
+            {name:"GRENINJA",returning:true,checked:true,file:"GRENINJA.png"},
+            {name:"MEWTWO",returning:true,checked:true,file:"MEWTWO.png"},
+            {name:"LUCARIO",returning:true,checked:true,file:"LUCARIO.png"},
+            {name:"ROWLET",returning:false,checked:false,file:"ROWLET.png"},
+            {name:"DECIDUEYE",returning:false,checked:false,file:"DECIDUEYE.png"},
+            {name:"POPPLIO",returning:false,checked:false,file:"POPPLIO.png"},
+            {name:"PRIMARINA",returning:false,checked:false,file:"PRIMARINA.png"},
+            {name:"LITTEN",returning:false,checked:false,file:"LITTEN.png"},
+            {name:"INCINEROAR",returning:false,checked:false,file:"INCINEROAR.png"},
+        ]
+    },
+    5:{
+        groupName: "METROID",
+        stayGrouped: true,
+        chars:[
+            {name:"SAMUS",returning:true,checked:true,file:"SAMUS.png"},
+            {name:"ZERO SUIT SAMUS",returning:true,checked:true,file:"ZERO_SUIT_SAMUS.png"},
+            {name:"RIDLEY",returning:false,checked:false,file:"RIDLEY.png"},
+            {name:"DARK SAMUS",returning:false,checked:false,file:"DARK_SAMUS.png"},
+        ]
+    },
+    6:{
+        groupName: "KID ICARUS",
+        stayGrouped: true,
+        chars:[
+            {name:"PIT",returning:true,checked:true,file:"PIT.png"},
+            {name:"PALUTENA",returning:true,checked:true,file:"PALUTENA.png"},
+            {name:"DARK PIT",returning:true,checked:true,file:"DARK_PIT.png"},
+            {name:"MEDUSA",returning:false,checked:false,file:"MEDUSA.png"},
+            {name:"HADES",returning:false,checked:false,file:"HADES.png"},
+            {name:"VIRIDI",returning:false,checked:false,file:"VIRIDI.png"},
+        ]
+    },
+    7:{
+        groupName: "FIRE EMBLEM",
+        stayGrouped: true,
+        chars:[
+            {name:"MARTH",returning:true,checked:true,file:"MARTH.png"},
+            {name:"ALM",returning:false,checked:false,file:"ALM.png"},
+            {name:"CELICA",returning:false,checked:false,file:"CELICA.png"},
+            {name:"ELIWOOD",returning:false,checked:false,file:"ELIWOOD.png"},
+            {name:"HECTOR",returning:false,checked:false,file:"HECTOR.png"},
+            {name:"LYN",returning:false,checked:false,file:"LYN.png"},
+            {name:"ROY",returning:true,checked:true,file:"ROY.png"},
+            {name:"EIRIKA",returning:false,checked:false,file:"EIRIKA.png"},
+            {name:"EPHRAIM",returning:false,checked:false,file:"EPHRAIM.png"},
+            {name:"IKE",returning:true,checked:true,file:"IKE.png"},
+            {name:"ROBIN",returning:true,checked:true,file:"ROBIN.png"},
+            {name:"CHROM",returning:false,checked:false,file:"CHROM.png"},
+            {name:"LUCINA",returning:true,checked:true,file:"LUCINA.png"},
+            {name:"THARJA",returning:false,checked:false,file:"THARJA.png"},
+            {name:"CORRIN",returning:true,checked:true,file:"CORRIN.png"},
+            {name:"CAMILLA",returning:false,checked:false,file:"CAMILLA.png"},
+            {name:"TAKUMI",returning:false,checked:false,file:"TAKUMI.png"},
+        ]
+    },
+    8:{
+        groupName: "KIRBY",
+        stayGrouped: true,
+        chars:[
+            {name:"KIRBY",returning:true,checked:true,file:"KIRBY.png"},
+            {name:"KING DEDEDE",returning:true,checked:true,file:"KING_DEDEDE.png"},
+            {name:"META KNIGHT",returning:true,checked:true,file:"META_KNIGHT.png"},
+            {name:"WADDLE DEE",returning:false,checked:false,file:"WADDLE_DEE.png"},
+            {name:"GOOEY",returning:false,checked:false,file:"GOOEY.png"},
+            {name:"MARX",returning:false,checked:false,file:"MARX.png"},
+        ]
+    },
+    9:{
+        groupName: "STARFOX",
+        stayGrouped: true,
+        chars:[
+            {name:"FOX",returning:true,checked:true,file:"FOX.png"},
+            {name:"FALCO",returning:true,checked:true,file:"FALCO.png"},
+            {name:"PEPPY",returning:false,checked:false,file:"PEPPY.png"},
+            {name:"SLIPPY",returning:false,checked:false,file:"SLIPPY.png"},
+            {name:"WOLF",returning:true,checked:false,file:"WOLF.png"},
+            {name:"KRYSTAL",returning:false,checked:false,file:"KRYSTAL.png"},
+        ]
+    },
+    10:{
+        groupName: "MOTHER",
+        stayGrouped: true,
+        chars:[
+            {name:"NESS",returning:true,checked:true,file:"NESS.png"},
+            {name:"LUCAS",returning:true,checked:true,file:"LUCAS.png"},
+        ]
+    },
+    11:{
+        groupName: "ANIMAL CROSSING",
+        stayGrouped: true,
+        chars:[
+            {name:"VILLAGER",returning:true,checked:true,file:"VILLAGER.png"},
+            {name:"ISABELLE",returning:false,checked:false,file:"ISABELLE.png"},
+            {name:"TOM NOOK",returning:false,checked:false,file:"TOM_NOOK.png"},
+        ]
+    },
+    12:{
+        groupName: "SPLATOON",
+        stayGrouped: true,
+        chars:[
+            {name:"INKLING",returning:false,checked:true,file:"INKLING.png"},
+            {name:"SQUID SISTERS",returning:false,checked:false,file:"SQUID_SISTERS.png"},
+            {name:"CALLIE",returning:false,checked:false,file:"CALLIE.png"},
+            {name:"MARIE",returning:false,checked:false,file:"MARIE.png"},
+            {name:"OFF THE HOOK",returning:false,checked:false,file:"OFF_THE_HOOK.png"},
+            {name:"PEARL",returning:false,checked:false,file:"PEARL.png"},
+            {name:"MARINA",returning:false,checked:false,file:"MARINA.png"},
+        ]
+    },
+    13:{
+        groupName: "F-ZERO",
+        stayGrouped: true,
+        chars:[
+            {name:"CAPTAIN FALCON",returning:true,checked:true,file:"CAPTAIN_FALCON.png"},
+            {name:"SAMURAI GOROH",returning:false,checked:false,file:"SAMURAI_GOROH.png"},
+            {name:"BLACK BULL",returning:false,checked:false,file:"BLACK_BULL.png"},
+        ]
+    },
+    14:{
+        groupName: "ARMS",
+        stayGrouped: true,
+        chars:[
+            {name:"SPRING MAN",returning:false,checked:false,file:"SPRING_MAN.png"},
+            {name:"RIBBON GIRL",returning:false,checked:false,file:"RIBBON_GIRL.png"},
+            {name:"MIN MIN",returning:false,checked:false,file:"MIN_MIN.png"},
+            {name:"TWINTELLE",returning:false,checked:false,file:"TWINTELLE.png"},
+        ]
+    },
+    15:{
+        groupName: "PUNCH-OUT",
+        stayGrouped: true,
+        chars:[
+            {name:"LITTLE MAC",returning:true,checked:true,file:"LITTLE_MAC.png"},
+            {name:"GLASS JOE",returning:false,checked:false,file:"GLASS_JOE.png"},
+            {name:"KING HIPPO",returning:false,checked:false,file:"KING_HIPPO.png"},
+        ]
+    },
+    16:{
+        groupName: "XENOBLADE",
+        stayGrouped: true,
+        chars:[
+            {name:"SHULK",returning:true,checked:true,file:"SHULK.png"},
+            {name:"REYN",returning:false,checked:false,file:"REYN.png"},
+            {name:"FIORA",returning:false,checked:false,file:"FIORA.png"},
+            {name:"ELMA",returning:false,checked:false,file:"ELMA.png"},
+            {name:"LIN",returning:false,checked:false,file:"LIN.png"},
+            {name:"REX",returning:false,checked:false,file:"REX.png"},
+            {name:"PYRA",returning:false,checked:false,file:"PYRA.png"},
+        ]
+    },
+    17:{
+        groupName: "PIKMIN",
+        stayGrouped: true,
+        chars:[
+            {name:"OLIMAR",returning:true,checked:true,file:"OLIMAR.png"},
+        ]
+    },
+    18:{
+        groupName: "Wii FIT",
+        stayGrouped: true,
+        chars:[
+            {name:"Wii FIT TRAINER",returning:true,checked:true,file:"WII_FIT_TRAINER.png"},
+        ]
+    },
+    19:{
+        groupName: "RETRO",
+        stayGrouped: false,
+        chars:[
+            {name:"MR. GAME & WATCH",returning:true,checked:true,file:"MR_GAME_AND_WATCH.png"},
+            {name:"R.O.B.",returning:true,checked:true,file:"ROB.png"},
+            {name:"DUCK HUNT",returning:true,checked:true,file:"DUCK_HUNT.png"},
+            {name:"ICE CLIMBERS",returning:true,checked:false,file:"ICE_CLIMBERS.png"},
+            {name:"TAKAMARU",returning:false,checked:false,file:"TAKAMARU.png"},
+        ]
+    },
+    20:{
+        groupName: "THE WONDERFUL 101",
+        stayGrouped: true,
+        chars:[
+            {name:"WONDER RED",returning:false,checked:false,file:"WONDER_RED.png"},
+            {name:"WONDER BLUE",returning:false,checked:false,file:"WONDER_BLUE.png"},
+            {name:"WONDER PINK",returning:false,checked:false,file:"WONDER_PINK.png"},
+        ]
+    },
+    99:{
+        groupName: "GUEST",
+        stayGrouped: false,
+        chars:[
+            {name:"PAC-MAN",returning:true,checked:true,file:"PAC_MAN.png"},
+            {name:"SIMON BELMONT",returning:false,checked:false,file:"SIMON_BELMONT.png"},
+            {name:"RAYMAN",returning:false,checked:false,file:"RAYMAN.png"},
+            {name:"RABBID",returning:false,checked:false,file:"RABBID.png"},
+            {name:"SONIC",returning:true,checked:true,file:"SONIC.png"},
+            {name:"TAILS",returning:false,checked:false,file:"TAILS.png"},
+            {name:"KNUCKLES",returning:false,checked:false,file:"KNUCKLES.png"},
+            {name:"MEGA MAN",returning:true,checked:true,file:"MEGA_MAN.png"},
+            {name:"RYU",returning:true,checked:true,file:"RYU.png"},
+            {name:"CHUN-LI",returning:false,checked:false,file:"CHUN_LI.png"},
+            {name:"CLOUD",returning:true,checked:true,file:"CLOUD.png"},
+            {name:"BLACK MAGE",returning:false,checked:false,file:"BLACK_MAGE.png"},
+            {name:"BAYONETTA",returning:true,checked:true,file:"BAYONETTA.png"},
+            {name:"SNAKE",returning:true,checked:false,file:"SNAKE.png"},
+        ]
+    },
+    100:{
+        groupName: "Mii",
+        stayGrouped: false,
+        chars:[
+            {name:"Mii FIGHTER",returning:true,checked:true,file:"MII_FIGHTER.png"},
+        ]
+    },
+}
+
+presets = {
+    clear:[],
+    smash64:["MARIO","LUIGI","DONKEY KONG","YOSHI","KIRBY","SAMUS","NESS","LINK","CAPTAIN FALCON","FOX","PIKACHU","JIGGLYPUFF"],
+    melee:["MARIO","LUIGI","PEACH","BOWSER","DR. MARIO","DONKEY KONG","YOSHI","KIRBY","SAMUS","NESS","LINK","ZELDA","GANONDORF","YOUNG LINK","CAPTAIN FALCON","FOX","FALCO","PIKACHU","JIGGLYPUFF","PICHU","MEWTWO","MARTH","ROY","MR. GAME & WATCH","ICE CLIMBERS"],
+    brawl:["MARIO","LUIGI","PEACH","BOWSER","WARIO","DONKEY KONG","DIDDY KONG","YOSHI","KIRBY","KING DEDEDE","META KNIGHT","SAMUS","PIT","NESS","LUCAS","LINK","ZELDA","GANONDORF","TOON LINK","CAPTAIN FALCON","FOX","FALCO","WOLF","PIKACHU","JIGGLYPUFF","POKEMON TRAINER","LUCARIO","MARTH","IKE","MR. GAME & WATCH","R.O.B.","ICE CLIMBERS","OLIMAR","SONIC","SNAKE"],
+    for:["MARIO","LUIGI","PEACH","BOWSER","BOWSER JR.","WARIO","DR. MARIO","ROSALINA","DONKEY KONG","DIDDY KONG","YOSHI","KIRBY","KING DEDEDE","META KNIGHT","SAMUS","ZERO SUIT SAMUS","PIT","PALUTENA","DARK PIT","NESS","LUCAS","LINK","ZELDA","SHEIK","GANONDORF","TOON LINK","CAPTAIN FALCON","FOX","FALCO","PIKACHU","JIGGLYPUFF","CHARIZARD","LUCARIO","GRENINJA","MEWTWO","MARTH","ROY","IKE","CORRIN","LUCINA","ROBIN","MR. GAME & WATCH","R.O.B.","DUCK HUNT","OLIMAR","SONIC","MEGA MAN","PAC-MAN","RYU","CLOUD","BAYONETTA","Wii FIT TRAINER","Mii FIGHTER","VILLAGER","LITTLE MAC","SHULK"],
+    confirmed:["MARIO","LINK","INKLING"]
+}
+
+function applyPreset (preset) {
+    list = presets[preset];
+    $.each(charList,function(groupNum,group) {
+        $.each(charList[groupNum].chars,function(charNum,char){
+            //console.log(char.name +" "+(list.indexOf(char.name) > -1));
+            charList[groupNum].chars[charNum].checked = (list.indexOf(char.name) > -1)?true:false ;
+        });
+    });
+    charChoice.drawList();
+    charGrid.drawIcons();
+}
+
+
+
+function getCookie(name) { /* generic cookie-checking function */
+	var value = "; " + document.cookie;
+	var parts = value.split("; " + name + "=");
+	if (parts.length === 2) { return parts.pop().split(";").shift(); }
+}
+
+function applyCookie() {
+    checkList = (typeof (getCookie('settings')) !== 'undefined') ? JSON.parse(getCookie('checkList')) : {};
+    if (Object.keys(checkList).length > 0) {
+        $.each(charList,function(groupNum,group) {
+            $.each(charList[groupNum].chars,function(charNum,char){
+                if (typeof(checkList[this.name]) !== 'undefined') {
+                    charList[groupNum].chars[charNum].checked = checkList[this.name]?true:false ;
+                }
+            });
+        });
+    }
+}
+
+
+
+charChoice = {
+    drawList:function() {
+
+        usableCols = Math.max(2,Math.min(14,Math.floor($(window).width() / 180)));
+        rCols = Math.floor(usableCols / 2);
+        nCols = usableCols - rCols;
+
+        allColumns = [];
+
+        for (i=0;i<usableCols;i++) {allColumns[i] = {size:0,contents:"",type:((i<rCols)?'returning':'new')};}
+
+        $.each(charList,function(groupNum,group){
+
+
+            rChars = [];
+            nChars = [];
+
+            $.each(group.chars,function(charNum,char){
+                char.index = groupNum+"-"+charNum;
+                char.markup = '<input '+(char.checked?'checked ':'')+'type="checkbox" class="charCheck" id="char-'+char.index+'" onclick="charGrid.drawIcons()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'+char.name+'<label for="char'+char.index+'"></label><br/>';
+                if (char.returning) {rChars.push(char);} else {nChars.push(char);}
+            });
+
+            minSizeR = 99999; minSizeN = 99999;
+            for (i=0;i<rCols;i++) {
+                if (allColumns[i].size < minSizeR) {useForR = i;}
+                minSizeR = Math.min(allColumns[i].size,minSizeR);
+            }
+
+            for (i=rCols;i<usableCols;i++) {
+                if (allColumns[i].size < minSizeN) {useForN = i;}
+                minSizeN = Math.min(allColumns[i].size,minSizeN);
+            }
+            
+            if (rChars.length > 0) {
+                allColumns[useForR].contents += "<b>"+group.groupName+"</b><br/>"; allColumns[useForR].size+=1;
+                $.each(rChars,function(charNum,char){
+                    allColumns[useForR].contents += char.markup;
+                    allColumns[useForR].size+=1;
+                });
+                allColumns[useForR].contents += "<br/>"; allColumns[useForR].size+=1;
+            }
+
+            if (nChars.length > 0) {
+                allColumns[useForN].contents += "<b>"+group.groupName+"</b><br/>"; allColumns[useForN].size+=1;
+                $.each(nChars,function(charNum,char){
+                    allColumns[useForN].contents += char.markup;
+                    allColumns[useForN].size+=1;
+                });
+                allColumns[useForN].contents += "<br/>"; allColumns[useForN].size+=1;
+            }
+            
+        });
+
+
+
+        for (c=0;c<=14;c++) {
+            if(typeof(allColumns[c]) !== 'undefined') {
+                $("#column"+c).html(allColumns[c].contents);
+            } else {
+                $("#column"+c).html("");
+            }
+        }
+
+        TweenMax.set("#titleN",{left: rCols * 180 + 20 });
+
+        xAdjust =  ($(window).width() - usableCols * 180) / 2;
+        TweenMax.set("#charChoices",{x:xAdjust});
+
+    }
+}
+
+
+
+
+
+charGrid = {
+    width: 1320,
+    height: 330,
+    ratio: 3.5,
+    count: 19,
+    reScale:function() {
+        gapSize = Math.floor($(window).width()*0.01);
+        this.width = $(window).width()-(gapSize*2);
+        this.height = Math.ceil(this.width * 0.25);
+
+        TweenMax.to("#gridContainer",0,{
+            left: gapSize,
+            top:50+(gapSize),
+            width:this.width,
+            height:this.height,
+            x:0,
+            onComplete:function(){
+                charGrid.drawIcons(true);
+            }
+        });
+
+        TweenMax.to("#greyBack",0,{height:this.height+(gapSize*2),onComplete:function(){
+            TweenMax.to("#greyBack,#gridContainer,#charChoices",1,{opacity:1,delay:0.4});;
+        }});
+
+        TweenMax.to("#charChoices",0,{top:this.height+90+(gapSize*2)});
+    },
+    gridSize: function() { 
+
+       rows = 10;
+        for (r=10;r>0;r--) {
+            c = Math.ceil(this.count/r);
+            if (c/r <= this.ratio) { rows = r; cols = c; }
+        }
+
+        return {
+            rows:rows,
+            cols:cols
+            };
+
+     },
+    rowLengths:function(gridSize){
+        arr = new Array();
+        start = 0;
+        count = this.count;
+        rows = gridSize.rows;
+        cols = gridSize.cols;
+        gaps = (rows*cols) - this.count;
+        short = Math.floor(count/rows);
+        long = Math.ceil(count/rows);
+
+        for (i=1;i<=rows;i++) {
+
+            if (i == rows) {
+                end = count;
+            } else if (i == 1 && gaps == 2) {
+                end = start + short;
+            } else if (gaps <= 2) {
+                end = start + long;
+            } else if ((rows - gaps) == 1 && rows > 4) {
+                end = start + ((i%2==0)?long:short);
+            } else if ((rows - gaps) == 1 && i >=2 ) {
+                end = Math.min(start + long,  Math.round((i/rows) * this.count,0) + 1 );
+            } else {
+                end = Math.round((i/rows) * this.count,0);
+            }
+            
+            arr[i-1] = end - start;
+            start = end;
+        }
+        return arr;
+    },
+    defineGrid:function() {
+        gridSize = this.gridSize();
+        cellHei = Math.floor(this.height/gridSize.rows);
+        cellWid = Math.floor(Math.min(cellHei*1.5,this.width/gridSize.cols));
+
+        cellHei2 = Math.floor(450/gridSize.rows);
+        cellWid2 = Math.floor(Math.min(cellHei2*1.5,1800/gridSize.cols));
+
+        xPos = 0;
+        yPos = Math.round((this.height - (cellHei * gridSize.rows)) / 2);
+
+        xPos2 = 0;
+        yPos2 = Math.round((450 - (cellHei2 * gridSize.rows)) / 2);
+
+        row = 0;
+        col = 0;
+        rowLengths = this.rowLengths(gridSize);
+        cells = [];
+        cells2 = [];
+
+        for (i=0;i<200;i++) {
+            if (i<this.count) {
+                
+                xOffset = Math.round((this.width - (rowLengths[row] * cellWid)) / 2);
+                xOffset2 = Math.round((1800 - (rowLengths[row] * cellWid2)) / 2);
+
+                cells[i] = {x:(xPos+xOffset),y:yPos,width:cellWid,height:cellHei};
+                cells2[i] = {x:(xPos2+xOffset2),y:yPos2,width:cellWid2,height:cellHei2};
+                
+                if( (col+1) == rowLengths[row]) {
+                    yPos += cellHei;
+                    yPos2 += cellHei2;
+                    xPos = 0;
+                    xPos2 = 0;
+
+                    row += 1;
+                    col = 0;
+                } else {
+                    xPos += cellWid;
+                    xPos2 += cellWid2;
+
+                    col += 1;
+                }
+            }
+        }
+
+       
+        return {rowLengths:rowLengths,cells:cells,cells2:cells2};
+    },
+    sortCharGroup: function(a,b){
+        aNum = parseInt(a.index.split("-")[1]);
+        bNum = parseInt(b.index.split("-")[1]);
+        if (aNum < bNum) { return -1; }
+        if (aNum > bNum) { return  1; }
+        return 0;
+    },
+    drawIcons:function(instant) {
+
+        charGroups = []; //an array for all the character groups/icons to be included
+        toRemove = []; //an array for every icon that may need to be removed
+        leftovers = []; //an array for icons that couldn't fit as a group
+        cookieObj = {};
+        time = (typeof(instant)!=='undefined' && instant == true)?0:0.2;
+
+
+        this.count = $(".charCheck:checked").length + 1; //the +1 is for the "random" icon
+
+        $.each( $(".charCheck") , function() { //reads each checkbox, grabs the character, sorts them into the arrays for removal or inclusion
+            parts = this.id.split("-");
+            g = parts[1];
+            c = parts[2];
+            charList[g].chars[c].index = g+"-"+c;
+            charList[g].chars[c].checked = this.checked; 
+            charList[g].chars[c].stayGrouped = charList[g].stayGrouped;
+            char = charList[g].chars[c];
+
+            if (typeof (charGroups[g]) == 'undefined') { 
+                charGroups[g] = []; 
+            }
+
+            if (this.checked) {
+                charGroups[g].push(char);
+                cookieObj[charList[g].chars[c].name] = 1;
+            } else {
+                toRemove.push(g+"-"+c);
+                cookieObj[charList[g].chars[c].name] = 0;
+            }
+        });
+
+        document.cookie = "checkList=" + JSON.stringify(cookieObj) + "; expires=Sat, 26 Dec 2025 12:00:00 UTC; path=/";
+
+        //fades out the unchecked icons
+        $.each(toRemove,function(k,v){ 
+            TweenMax.killTweensOf("#charBox"+v);
+            TweenMax.to("#charBox"+v,time,{opacity:0});
+            TweenMax.killTweensOf("#fixedCharBox"+v);
+            TweenMax.to("#fixedCharBox"+v,0,{opacity:0});
+        });
+
+    //rowSpace defines the space remaining in each row
+    //rowSlots fills up as we assign icons
+        grid = this.defineGrid();
+        rowSpace = grid.rowLengths;
+        cells = grid.cells;
+        rowSlots = new Array(rowSpace.length);
+        $.each(rowSlots,function(k,v){ rowSlots[k] = []; });
+        rowSpace[rowSpace.length-1]-=1; //saves a spot for the "random" icon
+
+
+        //SPECIAL EXCEPTION FOR MARIO; MARIO CHARS ALWAYS GO FIRST EVEN IF NOT ENOUGH SPACE IN ROW 1
+        //if necessary, splits up group 1 and moves the first chunk of characters into the otherwise empty group 0
+        if (typeof(charGroups[1]) !== 'undefined' && charGroups[1].length > rowSpace[0]) {
+            charGroups[0] = (charGroups[1].splice(0,rowSpace[0]));
+        } 
+       
+
+      //puts each group into the first row that has room for it, then deletes it from the queue
+        $.each(charGroups,function(k,v){
+
+            if(typeof(charGroups[k]) !== 'undefined') {
+                charGroups[k].sort(charGrid.sortCharGroup); //quick sort to keep the order right within the group
+            }
+            
+            if(typeof(charGroups[k]) !== 'undefined' && typeof(charGroups[k][0]) !== 'undefined' && charGroups[k][0].stayGrouped) {
+
+                for (r=0;r<rowSpace.length;r++) { //checks each row
+                    if (typeof(charGroups[k]) !== 'undefined') { //we have to check this again in case the group was placed and deleted
+                        if (rowSpace[r] >= charGroups[k].length) { //checks if there's room, places group in row if there is
+                            rowSpace[r] -= charGroups[k].length;  
+                            rowSlots[r] = rowSlots[r].concat(charGroups[k]);
+                            delete(charGroups[k]); //deletes group from queue if placement was successful
+                        }
+                    }
+                }
+
+            }
+            
+
+            if (typeof(charGroups[k]) !== 'undefined') { //checking one more time
+                leftovers = leftovers.concat(v); //goes in leftovers if it's still not gone from queue
+            }
+
+        });
+
+
+
+        rowSpace[rowSpace.length-1]+=1;
+        leftovers.push(   {name:"RANDOM",returning:true,checked:true,file:"RANDOM.png"});
+
+
+        $.each(leftovers,function(k,v) { //puts all the leftovers into whatever rows have room
+            for(r=0;r<rowSpace.length;r++) {
+                if(rowSpace[r] > 0 && typeof(leftovers[k]) !== 'undefined') {
+                    rowSpace[r] -=1;
+                    rowSlots[r].push(leftovers[k]);
+                    delete(leftovers[k]);
+                }
+            }
+        });
+
+        //takes all the separate rows and turns them into a single array of icons
+        iconChain = [];
+        $.each(rowSlots,function(k,v){ iconChain = iconChain.concat(v); });
+
+        $.each(iconChain,function(k,v){
+
+            //creates a character icon and places it onto the corresponding guideBox created earlier
+
+            cell = cells[k];
+            wid = cell.width;
+            hei = cell.height;
+            xPos = cell.x;
+            yPos = cell.y;  
+            
+            cell2 = cells2[k];
+            wid2 = cell2.width;
+            hei2 = cell2.height;
+            xPos2 = cell2.x;
+            yPos2 = cell2.y; 
+
+            if (typeof($("#charBox"+v.index)[0]) === 'undefined') {
+                 $("#gridContainer").append('<div class="charBox" id="charBox'+v.index+'" style="opacity:0;"><div class="charImage" style="background-image:url(icons/'+v.file+')"></div><div class="nameBar"></div><div class="nameText">'+v.name+'</div></div>');
+                 $("#fixedGridContainer").append('<div class="charBox" id="fixedCharBox'+v.index+'" style="opacity:0;"><div class="charImage" style="background-image:url(icons/'+v.file+')"></div><div class="nameBar"></div><div class="nameText">'+v.name+'</div></div>');          
+            }
+
+       
+            TweenMax.to("#charBox"+v.index,time,{
+                ease:Power3.easeInOut,
+                x:xPos,
+                y:yPos,
+                'background-position':((-xPos)+"px "+(-yPos)+"px"),
+                'background-size':((charGrid.width)+"px "+(charGrid.height)+"px"),
+                width:wid,
+                height:hei,
+                fontSize:((hei/5)+"px"),
+                lineHeight:((hei/5)+"px"),
+                delay:time,
+                onUpdate:function(){
+                    textWid = $("#charBox"+v.index+" .nameText").width();
+                    boxWid = this.target.width();
+                    newScale = Math.min(1,0.95*boxWid / textWid);
+                    xAdjust = (boxWid - (textWid * newScale))/2;
+                    TweenMax.set("#charBox"+v.index+" .nameText",{x:xAdjust,scaleX:newScale});
+                }
+                });
+            TweenMax.to("#charBox"+v.index,time,{opacity:1,delay:(time*2)});
+
+
+
+            TweenMax.to("#fixedCharBox"+v.index,0,{
+                ease:Power3.easeInOut,
+                x:xPos2,
+                y:yPos2,
+                'background-position':((-xPos2)+"px "+(-yPos2)+"px"),
+                'background-size':"1800px 450px",
+                width:wid2,
+                height:hei2,
+                fontSize:((hei2/5)+"px"),
+                lineHeight:((hei2/5)+"px"),
+                delay:0,
+                onUpdate:function(){
+                    textWid = $("#fixedCharBox"+v.index+" .nameText").width();
+                    boxWid = this.target.width();
+                    newScale = Math.min(1,0.95*boxWid / textWid);
+                    xAdjust = (boxWid - (textWid * newScale))/2;
+                    TweenMax.set("#fixedCharBox"+v.index+" .nameText",{x:xAdjust,scaleX:newScale});
+                }
+                });
+            TweenMax.to("#fixedCharBox"+v.index,0,{opacity:1,delay:0});
+
+
+
+        });
+
+
+    }
+}
+
+
+$(window).resize(function(){
+    charChoice.drawList();
+    charGrid.reScale();
+});
+
+$(window).load(function(){
+    applyCookie();
+    charChoice.drawList();
+    charGrid.reScale();
+    
+    setTimeout(function(){ charGrid.drawIcons(); }, 100);
+});
+
+
+</script>
+
+
+
+
+
+
+</body>
+</html>
